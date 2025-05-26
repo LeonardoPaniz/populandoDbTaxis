@@ -1,0 +1,36 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model cliente {
+  cliid   String    @id @db.VarChar(4)
+  nome    String    @db.VarChar(80)
+  cpf     String    @db.VarChar(14)
+  corrida corrida[]
+}
+
+model corrida {
+  cliid      String   @db.VarChar(4)
+  placa      String   @db.VarChar(7)
+  datapedido DateTime @db.Date
+  valor      Decimal  @db.Decimal(8, 2)
+  cliente    cliente  @relation(fields: [cliid], references: [cliid], onDelete: NoAction, onUpdate: NoAction)
+  taxi       taxi     @relation(fields: [placa], references: [placa], onDelete: NoAction, onUpdate: NoAction)
+
+  @@id([cliid, placa, datapedido])
+}
+
+model taxi {
+  placa   String    @id @db.VarChar(7)
+  marca   String    @db.VarChar(30)
+  modelo  String    @db.VarChar(30)
+  anofab  Int?
+  licenca String?   @db.VarChar(9)
+  corrida corrida[]
+}
